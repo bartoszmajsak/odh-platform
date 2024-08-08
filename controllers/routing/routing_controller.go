@@ -48,7 +48,7 @@ func (r *PlatformRoutingReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	reconcilers := []platformctrl.SubReconcileFunc{r.reconcileResources}
 
 	sourceRes := &unstructured.Unstructured{}
-	sourceRes.SetGroupVersionKind(r.component.CustomResourceType.GroupVersionKind)
+	sourceRes.SetGroupVersionKind(r.component.ObjectReference.GroupVersionKind)
 
 	if err := r.Client.Get(ctx, req.NamespacedName, sourceRes); err != nil {
 		if k8serr.IsNotFound(err) {
@@ -87,8 +87,8 @@ func (r *PlatformRoutingReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&metav1.PartialObjectMetadata{
 			TypeMeta: metav1.TypeMeta{
-				APIVersion: r.component.CustomResourceType.GroupVersion().String(),
-				Kind:       r.component.CustomResourceType.Kind,
+				APIVersion: r.component.ObjectReference.GroupVersion().String(),
+				Kind:       r.component.ObjectReference.Kind,
 			},
 		}, builder.OnlyMetadata).
 		Owns(&istionetworkingv1beta1.DestinationRule{}).

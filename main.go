@@ -64,7 +64,7 @@ func main() {
 		WithName("odh-platform")
 	ctrlLog.Info("creating controller instance", "version", version.Version, "commit", version.Commit, "build-time", version.BuildTime)
 
-	authorizationComponents, errLoad := config.Load(spi.ProtectedResource{}, config.GetConfigFile())
+	authorizationComponents, errLoad := config.Load(spi.AuthorizationComponent{}, config.GetConfigFile())
 	if errLoad != nil {
 		setupLog.Error(errLoad, "unable to load config from "+config.GetConfigFile())
 		os.Exit(1)
@@ -78,7 +78,7 @@ func main() {
 	for _, component := range authorizationComponents {
 		if err = authorization.NewPlatformAuthorizationReconciler(mgr.GetClient(), ctrlLog, component, authorizationConfig).
 			SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "odh-platform-"+component.CustomResourceType.Kind)
+			setupLog.Error(err, "unable to create controller", "controller", "odh-platform-"+component.ObjectReference.Kind)
 			os.Exit(1)
 		}
 	}
@@ -104,7 +104,7 @@ func main() {
 			routingConfig,
 		).
 			SetupWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create controller", "controller", "odh-platform-"+component.CustomResourceType.Kind)
+			setupLog.Error(err, "unable to create controller", "controller", "odh-platform-"+component.ObjectReference.Kind)
 			os.Exit(1)
 		}
 	}

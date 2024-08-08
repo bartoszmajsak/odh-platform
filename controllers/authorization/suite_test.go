@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/opendatahub-io/odh-platform/controllers/authorization"
 	"github.com/opendatahub-io/odh-platform/pkg/config"
+	"github.com/opendatahub-io/odh-platform/pkg/platform"
 	"github.com/opendatahub-io/odh-platform/pkg/spi"
 	"github.com/opendatahub-io/odh-platform/test"
 	"github.com/opendatahub-io/odh-platform/test/k8senvtest"
@@ -32,18 +33,20 @@ var _ = SynchronizedBeforeSuite(func(ctx context.Context) {
 		authorization.NewPlatformAuthorizationReconciler(
 			nil,
 			ctrl.Log.WithName("controllers").WithName("platform"),
-			spi.ProtectedResource{
-				CustomResourceType: spi.ResourceSchema{
-					GroupVersionKind: schema.GroupVersionKind{
-						Version: "v1",
-						Group:   "opendatahub.io",
-						Kind:    "Component",
+			spi.AuthorizationComponent{
+				ProtectedResource: platform.ProtectedResource{
+					ObjectReference: platform.ObjectReference{
+						GroupVersionKind: schema.GroupVersionKind{
+							Version: "v1",
+							Group:   "opendatahub.io",
+							Kind:    "Component",
+						},
+						Resources: "components",
 					},
-					Resources: "components",
+					WorkloadSelector: map[string]string{},
+					Ports:            []string{},
+					HostPaths:        []string{"spec.host"},
 				},
-				WorkloadSelector: map[string]string{},
-				Ports:            []string{},
-				HostPaths:        []string{"spec.host"},
 			},
 			authorization.PlatformAuthorizationConfig{
 				Label:        config.GetAuthorinoLabel(),

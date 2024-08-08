@@ -21,7 +21,7 @@ import (
 )
 
 func NewPlatformAuthorizationReconciler(cli client.Client, log logr.Logger,
-	authComponent spi.ProtectedResource, config PlatformAuthorizationConfig) *PlatformAuthorizationReconciler {
+	authComponent spi.AuthorizationComponent, config PlatformAuthorizationConfig) *PlatformAuthorizationReconciler {
 	return &PlatformAuthorizationReconciler{
 		Client:         cli,
 		log:            log,
@@ -47,7 +47,7 @@ type PlatformAuthorizationReconciler struct {
 	client.Client
 	log            logr.Logger
 	config         PlatformAuthorizationConfig
-	authComponent  spi.ProtectedResource
+	authComponent  spi.AuthorizationComponent
 	typeDetector   spi.AuthTypeDetector
 	hostExtractor  spi.HostExtractor
 	templateLoader spi.AuthConfigTemplateLoader
@@ -62,7 +62,7 @@ func (r *PlatformAuthorizationReconciler) Reconcile(ctx context.Context, req ctr
 	reconcilers := []platformctrl.SubReconcileFunc{r.reconcileAuthConfig, r.reconcileAuthPolicy, r.reconcilePeerAuthentication}
 
 	sourceRes := &unstructured.Unstructured{}
-	sourceRes.SetGroupVersionKind(r.authComponent.CustomResourceType.GroupVersionKind)
+	sourceRes.SetGroupVersionKind(r.authComponent.ObjectReference.GroupVersionKind)
 
 	if err := r.Client.Get(ctx, req.NamespacedName, sourceRes); err != nil {
 		if k8serr.IsNotFound(err) {
@@ -95,8 +95,8 @@ func (r *PlatformAuthorizationReconciler) SetupWithManager(mgr ctrl.Manager) err
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&metav1.PartialObjectMetadata{
 			TypeMeta: metav1.TypeMeta{
-				APIVersion: r.authComponent.CustomResourceType.GroupVersion().String(),
-				Kind:       r.authComponent.CustomResourceType.Kind,
+				APIVersion: r.authComponent.ObjectReference.GroupVersion().String(),
+				Kind:       r.authComponent.ObjectReference.Kind,
 			},
 		}, builder.OnlyMetadata).
 		Owns(&authorinov1beta2.AuthConfig{}).

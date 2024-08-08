@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 
 	authorinov1beta2 "github.com/kuadrant/authorino/api/v1beta2"
+	"github.com/opendatahub-io/odh-platform/pkg/platform"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 )
 
@@ -22,26 +22,23 @@ const (
 	Anonymous   AuthType = "anonymous"
 )
 
-type ProtectedResource struct {
-	CustomResourceType ResourceSchema    `json:"schema"`
-	WorkloadSelector   map[string]string `json:"workloadSelector"` // label key value
-	Ports              []string          `json:"ports"`            // port numbers
-	HostPaths          []string          `json:"hostPaths"`        // json path expression e.g. status.url
+type AuthorizationComponent struct {
+	platform.ProtectedResource
 }
 
 // TODO: the config file will contain more then just AuthorizationComponents now.. adjust to read it multiple times pr Type or load it all at once..?
 // TODO: move the config load and save into a sub package and lazy share with operator.
-func (a ProtectedResource) Load(configPath string) ([]ProtectedResource, error) {
+func (a AuthorizationComponent) Load(configPath string) ([]AuthorizationComponent, error) {
 	content, err := os.ReadFile(configPath + string(filepath.Separator) + "authorization")
 	if err != nil {
-		return []ProtectedResource{}, fmt.Errorf("could not read config file [%s]: %w", configPath, err)
+		return []AuthorizationComponent{}, fmt.Errorf("could not read config file [%s]: %w", configPath, err)
 	}
 
-	var authz []ProtectedResource
+	var authz []AuthorizationComponent
 
 	err = json.Unmarshal(content, &authz)
 	if err != nil {
-		return []ProtectedResource{}, fmt.Errorf("could not parse json content of [%s]: %w", configPath, err)
+		return []AuthorizationComponent{}, fmt.Errorf("could not parse json content of [%s]: %w", configPath, err)
 	}
 
 	return authz, nil
@@ -76,7 +73,7 @@ const (
 )
 
 type RoutingComponent struct {
-	CustomResourceType ResourceSchema `json:"schema"`
+	platform.RoutingTarget
 }
 
 func (r RoutingComponent) Load(configPath string) ([]RoutingComponent, error) {
@@ -121,11 +118,4 @@ type RoutingTemplateData struct {
 //   - Loader source
 type RoutingTemplateLoader interface {
 	Load(ctx context.Context, routeType RouteType, key types.NamespacedName, data RoutingTemplateData) ([]*unstructured.Unstructured, error)
-}
-
-type ResourceSchema struct {
-	// GroupVersionKind specifies the group, version, and kind of the resource.
-	schema.GroupVersionKind `json:"gvk,omitempty"`
-	// Resources is the type of resource being protected, e.g., "pods", "services".
-	Resources string `json:"resources,omitempty"`
 }

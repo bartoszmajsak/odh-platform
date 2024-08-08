@@ -14,13 +14,15 @@ var _ = Describe("Loading capabilities", test.Unit(), func() {
 	Context("loading capabilities from files", func() {
 
 		It("should load authorized resources", func() {
-			authorizationComponents, err := config.Load(spi.ProtectedResource{}, "../../test/data/config")
+			configPath := "../../test/data/config"
+			authorizationComponents, err := config.Load(spi.AuthorizationComponent{}, configPath)
 			Expect(err).To(Succeed())
-			Expect(authorizationComponents).To(ContainElement(
-				MatchFields(IgnoreExtras, Fields{
+			Expect(authorizationComponents).To(ContainElement(MatchFields(IgnoreExtras, Fields{
+				"ProtectedResource": MatchFields(IgnoreExtras, Fields{
 					"Ports":     ContainElement("9192"),
 					"HostPaths": ContainElement("status.url"),
-				})))
+				}),
+			})))
 		})
 	})
 
