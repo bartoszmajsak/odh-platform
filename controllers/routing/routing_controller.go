@@ -19,7 +19,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func NewPlatformRoutingReconciler(cli client.Client, log logr.Logger, routingComponent spi.RoutingComponent, config PlatformRoutingConfiguration) *PlatformRoutingReconciler {
+func NewPlatformRoutingReconciler(cli client.Client, log logr.Logger, routingComponent spi.RoutingComponent, config spi.PlatformRoutingConfiguration) *PlatformRoutingReconciler {
 	return &PlatformRoutingReconciler{
 		Client:         cli,
 		log:            log,
@@ -35,14 +35,7 @@ type PlatformRoutingReconciler struct {
 	log            logr.Logger
 	component      spi.RoutingComponent
 	templateLoader spi.RoutingTemplateLoader
-	config         PlatformRoutingConfiguration
-}
-
-type PlatformRoutingConfiguration struct {
-	IngressSelectorLabel,
-	IngressSelectorValue,
-	IngressService,
-	GatewayNamespace string
+	config         spi.PlatformRoutingConfiguration
 }
 
 // +kubebuilder:rbac:groups="route.openshift.io",resources=routes,verbs=*
