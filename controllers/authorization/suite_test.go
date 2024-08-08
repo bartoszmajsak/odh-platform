@@ -32,7 +32,7 @@ var _ = SynchronizedBeforeSuite(func(ctx context.Context) {
 		authorization.NewPlatformAuthorizationReconciler(
 			nil,
 			ctrl.Log.WithName("controllers").WithName("platform"),
-			spi.AuthorizationComponent{
+			spi.ProtectedResource{
 				CustomResourceType: spi.ResourceSchema{
 					GroupVersionKind: schema.GroupVersionKind{
 						Version: "v1",

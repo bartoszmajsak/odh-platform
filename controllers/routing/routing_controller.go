@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-logr/logr"
 	platformctrl "github.com/opendatahub-io/odh-platform/controllers"
-	"github.com/opendatahub-io/odh-platform/pkg/resource/routing"
+	"github.com/opendatahub-io/odh-platform/pkg/routing"
 	"github.com/opendatahub-io/odh-platform/pkg/spi"
 	openshiftroutev1 "github.com/openshift/api/route/v1"
 	istionetworkingv1beta1 "istio.io/client-go/pkg/apis/networking/v1beta1"

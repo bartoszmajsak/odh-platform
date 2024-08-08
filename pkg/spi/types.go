@@ -22,7 +22,7 @@ const (
 	Anonymous   AuthType = "anonymous"
 )
 
-type AuthorizationComponent struct {
+type ProtectedResource struct {
 	CustomResourceType ResourceSchema    `json:"schema"`
 	WorkloadSelector   map[string]string `json:"workloadSelector"` // label key value
 	Ports              []string          `json:"ports"`            // port numbers
@@ -31,17 +31,17 @@ type AuthorizationComponent struct {
 
 // TODO: the config file will contain more then just AuthorizationComponents now.. adjust to read it multiple times pr Type or load it all at once..?
 // TODO: move the config load and save into a sub package and lazy share with operator.
-func (a AuthorizationComponent) Load(configPath string) ([]AuthorizationComponent, error) {
+func (a ProtectedResource) Load(configPath string) ([]ProtectedResource, error) {
 	content, err := os.ReadFile(configPath + string(filepath.Separator) + "authorization")
 	if err != nil {
-		return []AuthorizationComponent{}, fmt.Errorf("could not read config file [%s]: %w", configPath, err)
+		return []ProtectedResource{}, fmt.Errorf("could not read config file [%s]: %w", configPath, err)
 	}
 
-	var authz []AuthorizationComponent
+	var authz []ProtectedResource
 
 	err = json.Unmarshal(content, &authz)
 	if err != nil {
-		return []AuthorizationComponent{}, fmt.Errorf("could not parse json content of [%s]: %w", configPath, err)
+		return []ProtectedResource{}, fmt.Errorf("could not parse json content of [%s]: %w", configPath, err)
 	}
 
 	return authz, nil
@@ -79,9 +79,7 @@ type RoutingComponent struct {
 	CustomResourceType ResourceSchema `json:"schema"`
 }
 
-// TODO: the config file will contain more then just AuthorizationComponents now.. adjust to read it multiple times pr Type or load it all at once..?
-// TODO: move the config load and save into a sub package and lazy share with operator.
-func (a RoutingComponent) Load(configPath string) ([]RoutingComponent, error) {
+func (r RoutingComponent) Load(configPath string) ([]RoutingComponent, error) {
 	content, err := os.ReadFile(configPath + string(filepath.Separator) + "routing")
 	if err != nil {
 		return []RoutingComponent{}, fmt.Errorf("could not read config file [%s]: %w", configPath, err)

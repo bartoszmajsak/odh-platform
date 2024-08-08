@@ -64,7 +64,7 @@ func main() {
 		WithName("odh-platform")
 	ctrlLog.Info("creating controller instance", "version", version.Version, "commit", version.Commit, "build-time", version.BuildTime)
 
-	authorizationComponents, errLoad := config.Load(spi.AuthorizationComponent{}, config.GetConfigFile())
+	authorizationComponents, errLoad := config.Load(spi.ProtectedResource{}, config.GetConfigFile())
 	if errLoad != nil {
 		setupLog.Error(errLoad, "unable to load config from "+config.GetConfigFile())
 		os.Exit(1)
